@@ -1,4 +1,0 @@
-- name : Retrieve the binaries for JDK and ZAP
-  hosts: Zap-Host
-  roles:
-    - zap-setup
