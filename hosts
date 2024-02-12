@@ -1,2 +1,3 @@
 [windows]
 Zap-Host ansible_host=4.227.155.44 ansible_connection=winrm ansible_port=5985 ansible_user=azureuser ansible_password=Chidori@1234 ansible_winrm_server_cert_validation=ignore
+
