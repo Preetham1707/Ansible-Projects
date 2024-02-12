@@ -4,3 +4,4 @@ jdk_destination_path : D:\JDK\
 
 Zap_binary_url: https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2_14_0_windows.exe
 zap_destination_path : D:\ZAP\
+
