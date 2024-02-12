@@ -1,0 +1,22 @@
+---
+- name: Installing JDK 18
+  win_get_url:
+    url: '{{openjdk_binary_url}}'
+    dest: '{{jdk_destination_path}}'
+  register: Java_download_task
+  until: Java_download_task is succeeded
+  retries: 5
+  delay : 2
+  check_mode: false
+
+
+
+- name: Installing Zap
+  win_get_url:
+    url: '{{Zap_binary_url}}'
+    dest: '{{zap_destination_path}}'
+  register: Zap_download_task
+  until: Zap_download_task is succeeded
+  retries: 5
+  delay : 2
+  check_mode: false

@@ -1,0 +1,26 @@
+---
+- name : retrieve and download tasks
+  hosts: windows
+
+  tasks:
+    - name: Installing JDK 18
+      ansible.windows.win_get_url:
+        url: 'https://download.oracle.com/java/17/latest/jdk-17_windows-x64_bin.exe'
+        dest: D:\
+      register: Java_download_task
+      until: Java_download_task is succeeded
+      retries: 5
+      delay : 2
+      check_mode: false
+
+
+
+    - name: Installing Zap
+      ansible.windows.win_get_url:
+        url: 'https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2_14_0_windows.exe'
+        dest: D:\
+      register: Zap_download_task
+      until: Zap_download_task is succeeded
+      retries: 5
+      delay : 2
+      check_mode: false
