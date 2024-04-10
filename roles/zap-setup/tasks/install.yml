@@ -1,39 +1,34 @@
 ---
+- name: Install > Create the ZAP temp directory 
+  ansible.windows.win_file:
+    path: "{{Zap_temp_path}}"
+    state: directory
+  register: Zap_directory_creation
+  until: Zap_directory_creation is succeeded
+  retries: 5
+  delay: 2
+  check_mode: false
 
- - name: Install PowerShellCommunityExtensions (PSCX)
-   ansible.builtin.win_shell: Install-Module -Name Pscx -Force -AllowClobber -Scope AllUsers
-   args:
-     executable: powershell.exe
-   changed_when: false  # Mark the task as non-changing to avoid unnecessary reboots
+- name: Install > Downloading Zap Binary
+  ansible.windows.win_get_url:
+    url: "{{Zap_binary_url}}"
+    dest: "{{Zap_temp_path}}"
+  register: Zap_download_task
+  until: Zap_download_task is succeeded
+  retries: 5
+  delay: 2
+  check_mode: false
 
 
 
- - name: Unzip JDK 
-   community.windows.win_unzip:
-     src: D:\JDK\openjdk-20.0.2_windows-x64_bin.zip
-     dest: C:\JDK\openjdk-20.0.2_windows-x64_bin
-     
- - name: Set Java Environment Variable 
-   ansible.windows.win_environment:
-     state: present 
-     name: Path
-     value: "{{ ansible_env.PATH }};C:\\JDK\\openjdk-20.0.2_windows-x64_bin\\jdk-20.0.2\\bin"
-
- - name: check Java Version
-   ansible.builtin.win_shell: 'java --version'
-   register: java_Version_output
-   
-
-# - name : Installing ZAP
-#   ansible.windows.win_package:
-#     path: D:\ZAP\ZAP_2_14_0_windows.exe
-#     product_id: ZAP_2_14_0_windows
-#     creates_path: C:\Program Files\ZAP_2_14_0_windows\ZAP_2_14_0_windows.exe
-#     state: present
-#   register: installation_zap
-#   until: installation_zap is succeeded
-#   retries: 2
-#   delay: 2
-#   check_mode: false
+- name: Install > Unzip Zap Binary
+  win_unzip:
+    src: "{{Zap_temp_path}}\\ZAP_2.14.0_Crossplatform.zip"
+    dest: "{{zap_destination_path}}"
+  register: Zap_extract_task
+  until: Zap_extract_task is succeeded
+  retries: 5
+  delay: 2
+  check_mode: false
 
 
