@@ -1,0 +1,6 @@
+- name : retrieve and download ZAP
+  hosts: win
+
+
+  roles:
+    - zap-setup
