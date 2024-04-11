@@ -1,6 +1,9 @@
 - name : retrieve and download ZAP
   hosts: win
 
-
   roles:
-    - zap-setup
+    - role:zap-setup
+      vars:
+        # Set to absent for uninstall
+        software_state: "present"
+    
