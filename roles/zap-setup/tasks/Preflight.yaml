@@ -1,0 +1,45 @@
+---
+- name: Preflight > Preflight
+  when: software_state == "present"
+
+  block:
+  
+    - name: Preflight > Set fact to determine if OWASP Zap should be installed
+      ansible.builtin.set_fact:
+        zap_should_install: false
+        zap_should_update: false
+
+    - name: Preflight > Check if OWASP Zap is already installed
+      win_stat:
+        path: "{{ zap_install_dir }}\\zap.exe"
+      register: zap_is_already_installed
+
+    - name: Preflight > Set fact to install OWASP Zap if it does not exist
+      ansible.builtin.set_fact:
+        zap_should_install: true
+      when: not zap_is_already_installed.stat.exists
+
+    - name: Preflight > Gather currently installed version (if any)
+      win_command: '"{{ zap_install_dir }}\\zap.exe" -version'
+      changed_when: false
+      register: zap_version_output
+      when: zap_is_already_installed.stat.exists
+
+    - name: Preflight > Extract version
+      ansible.builtin.set_fact:
+        zap_installed_version: "{{ zap_version_output.stdout | regex_search('.*version ([0-9]+\\.[0-9]+\\.[0-9]+).*', '\\1') | first }}"
+      when: zap_version_output.stdout is defined
+
+    - name: Preflight > Set fact to update OWASP Zap if the version does not match
+      ansible.builtin.set_fact:
+        zap_should_update: true
+      when: >
+        not ansible_check_mode and
+        zap_is_already_installed.stat.exists and
+        zap_installed_version != zap_version
+
+    - name: Preflight > Display current status
+      ansible.builtin.debug:
+        msg:
+        - "Should install: {{ zap_should_install }}"
+        - "Should update: {{ zap_should_update }}{% if zap_installed_version is defined %} (current version: {{ zap_installed_version | default('') }}){% endif %}"
