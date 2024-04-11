@@ -1,34 +1,57 @@
 ---
-- name: Install > Create the ZAP temp directory 
-  ansible.windows.win_file:
-    path: "{{Zap_temp_path}}"
-    state: directory
-  register: Zap_directory_creation
-  until: Zap_directory_creation is succeeded
-  retries: 5
-  delay: 2
-  check_mode: false
+- name: Preflight > Preflight
+  when: software_state == "present" and (zap_should_install or zap_should_update)
 
-- name: Install > Downloading Zap Binary
-  ansible.windows.win_get_url:
-    url: "{{Zap_binary_url}}"
-    dest: "{{Zap_temp_path}}"
-  register: Zap_download_task
-  until: Zap_download_task is succeeded
-  retries: 5
-  delay: 2
-  check_mode: false
+  block:
+
+      - name: Install > Create the ZAP temp directory
+        ansible.windows.win_file:
+          path: "{{zap_temp_path}}"
+          state: directory
+        register: zap_directory_creation
+        until: zap_directory_creation is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false
+
+      - name: Install > Downloading Zap Binary
+        ansible.windows.win_get_url:
+          url: "{{zap_binary_url}}"
+          dest: "{{zap_temp_path}}"
+        register: zap_download_task
+        until: zap_download_task is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false
+
+      - name: Install > Unzip Zap Binary
+        win_unzip:
+          src: "{{zap_temp_path}}\\ZAP_2.14.0_Crossplatform.zip"
+          dest: "{{zap_temp_path}}\\"
+        register: zap_extract_task
+        until: zap_extract_task is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false
+
+      - name: Install > Copy Zap Binary files
+        win_copy:
+          src: "{{zap_temp_path}}/ZAP_2.14.0/"
+          dest: "{{zap_install_dir}}"
+          remote_src: true
+        register: zap_copy_task
+        until: zap_copy_task is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false
 
 
-
-- name: Install > Unzip Zap Binary
-  win_unzip:
-    src: "{{Zap_temp_path}}\\ZAP_2.14.0_Crossplatform.zip"
-    dest: "{{zap_destination_path}}"
-  register: Zap_extract_task
-  until: Zap_extract_task is succeeded
-  retries: 5
-  delay: 2
-  check_mode: false
-
-
+      - name: Install > Cleaning up the Zap temp directory
+        ansible.windows.win_file:
+          path: "{{zap_temp_path}}"
+          state: absent
+        register: zap_clean_temp_dir
+        until: zap_clean_temp_dir is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false

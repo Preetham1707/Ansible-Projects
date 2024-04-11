@@ -2,6 +2,8 @@
 # openjdk_binary_url: https://download.java.net/java/GA/jdk20.0.2/6e380f22cbe7469fa75fb448bd903d8e/9/GPL/openjdk-20.0.2_windows-x64_bin.zip
 # jdk_destination_path : D:\JDK\
 
-Zap_binary_url: 'https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Crossplatform.zip'
-zap_destination_path : 'D:\APPS\JENKINS\'
-Zap_temp_path: 'D:\ZAP_TEMP\'
+
+zap_version: '2.14.0'
+zap_binary_url: 'https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Crossplatform.zip'
+zap_install_dir : 'D:\\APPS\\JENKINS\\ZAP\\'
+zap_temp_path: 'D:\\ZAP_TEMP\\'

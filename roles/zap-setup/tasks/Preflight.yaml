@@ -11,7 +11,7 @@
 
     - name: Preflight > Check if OWASP Zap is already installed
       win_stat:
-        path: "{{ zap_install_dir }}\\zap.exe"
+        path: "{{ zap_install_dir }}\\zap.bat"
       register: zap_is_already_installed
 
     - name: Preflight > Set fact to install OWASP Zap if it does not exist
@@ -20,15 +20,16 @@
       when: not zap_is_already_installed.stat.exists
 
     - name: Preflight > Gather currently installed version (if any)
-      win_command: '"{{ zap_install_dir }}\\zap.exe" -version'
+      win_command: "{{ zap_install_dir }}\\zap.bat -version"
       changed_when: false
       register: zap_version_output
       when: zap_is_already_installed.stat.exists
 
     - name: Preflight > Extract version
       ansible.builtin.set_fact:
-        zap_installed_version: "{{ zap_version_output.stdout | regex_search('.*version ([0-9]+\\.[0-9]+\\.[0-9]+).*', '\\1') | first }}"
+        zap_installed_version: "{{ zap_version_output.stdout | regex_search('(\\d+\\.\\d+\\.\\d+)') }}"
       when: zap_version_output.stdout is defined
+
 
     - name: Preflight > Set fact to update OWASP Zap if the version does not match
       ansible.builtin.set_fact:
