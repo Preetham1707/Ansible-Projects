@@ -17,7 +17,7 @@
       - name: Install > Downloading Zap Binary
         ansible.windows.win_get_url:
           url: "{{zap_binary_url}}"
-          dest: "{{zap_temp_path}}"
+          dest: "{{zap_temp_path}}\\"
         register: zap_download_task
         until: zap_download_task is succeeded
         retries: 5
