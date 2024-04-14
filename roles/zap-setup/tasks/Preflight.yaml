@@ -20,7 +20,7 @@
       when: not zap_is_already_installed.stat.exists
 
     - name: Preflight > Gather currently installed version (if any)
-      win_command: "{{ zap_install_dir }}\\zap.bat -version"
+      win_command: "{{ zap_install_dir }}\\zap.bat {{ zap_install_dir }}\\zap-2.14.0.jar -version"
       changed_when: false
       register: zap_version_output
       when: zap_is_already_installed.stat.exists
