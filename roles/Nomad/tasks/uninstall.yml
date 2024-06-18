@@ -1,0 +1,43 @@
+- name: Uninstall > Uninstall
+  when: software_state == "absent" 
+
+  block:
+
+      - name: Uninstall > Check if nomad is already installed
+      win_stat:
+        path: "{{ nomad_install_dir }}\\nomad.exe"
+      register: nomad_is_already_installed
+
+      - name: Uninstall > Check if nomad service is running
+      win_service:
+        name: nomad
+      ignore_unreachable: yes
+      register: nomad_service_exists 
+
+      - name: Uninstall > Stop service 
+        win_command: "{{nomad_install_dir}}//nomad-service.exe stop"
+        when: nomad_is_already_installed.stat.exists and nomad_service_exists.exists
+
+
+       - name: Uninstall > Uninstall 
+        win_command: "{{nomad_install_dir}}//nomad-service.exe uninstall"
+        when: nomad_is_already_installed.stat.exists and nomad_service_exists.exists
+
+
+      - name: Uninstall > Ensure that Nomad is removed on system path variable
+        win_path:
+          elements::%NOMAD_DIR"
+        state: absent
+
+
+      - name: uninstall > Removing  Nomad Dir
+        win_file:
+          path: "{{item}}"
+          state: absent
+        with_items:
+        - "{{nomad_install_dir}}"
+        - "{{nomad_data_dir}}"
+        - "{{nomad_config_dir}}"
+        - "{{nomad_certs_dir}}"
+        - "{{nomad_policies_dir}}"
+        when: nomad_is_already_installed.stat.exists

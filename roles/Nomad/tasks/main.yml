@@ -1,0 +1,9 @@
+---
+- include_tasks: Preflight.yaml
+
+- include_tasks: install.yml
+
+- include_tasks: install-service.yml
+  
+
+- include_tasks: uninstall-service.yml

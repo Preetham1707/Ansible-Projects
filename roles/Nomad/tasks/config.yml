@@ -1,0 +1,15 @@
+---
+- name: Preflight > Preflight
+  when: software_state == "present" and (zap_should_install or zap_should_update)
+
+  block:
+    - name: Config > Copy the Zap batch file.
+      ansible.windows.win_copy:
+        src: zap.bat
+        dest: "{{zap_install_dir}}"
+        backup: yes
+      register: zap_bat_copy
+      until: zap_bat_copy is succeeded
+      retries: 5
+      delay: 2
+      check_mode: false

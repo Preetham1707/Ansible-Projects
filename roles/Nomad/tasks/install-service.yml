@@ -1,0 +1,27 @@
+- name: Install > Install
+  when: software_state == "present" and ( nomad_should_install )
+
+  block:
+    - name: Install > Downloading WinsW Binary
+      ansible.windows.win_get_url:
+        url: "{{winsw_binary_url}}"
+        dest: "{{nomad_install_dir}}/nomad-service.exe"
+      register: winsw_download_task
+      until: winsw_download_task is succeeded
+      retries: 5
+      delay: 2
+      check_mode: false
+
+    - name: service > Generate service configuration file
+      win_copy:
+        src: "nomad-service.xml"
+        dest: "{{nomad_install_dir}}\\nomad-service.xml"
+
+
+    - name: service > Install service configuration file
+      win_command: "{{nomad_install_dir}}\\nomad-service.exe uninstall"
+      changed_when: false
+       
+
+
+    

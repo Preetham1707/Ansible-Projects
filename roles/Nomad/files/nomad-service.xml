@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service>
+  <id>nomad</id>
+  <name>nomadis</name>
+  <description>This is a Nomad agent service.</description>
+  <executable>%BASE%\nomad.exe</executable>
+  <arguments>agent -config C:\Nomad\nomad.hcl</arguments>
+  <logpath>%BASE%logs</logpath>
+  <logmode>rotate</logmode>
+  <startmode>Automatic</startmode>
+</service>

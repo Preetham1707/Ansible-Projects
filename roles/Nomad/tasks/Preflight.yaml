@@ -1,0 +1,52 @@
+---
+- name: Preflight > Preflight
+  when: software_state == "present"
+
+  block:
+  
+    - name: Preflight > Set fact to determine if Nomad should be installed
+      ansible.builtin.set_fact:
+        nomad_should_install: false
+        nomad_should_update: false
+
+    - name: Preflight > Check if nomad is already installed
+      win_stat:
+        path: "{{ nomad_install_dir }}\\nomad.exe"
+      register: nomad_is_already_installed
+
+    - name: Preflight > Check if nomad service is running
+      win_service:
+        name: nomadis
+      ignore_unreachable: yes
+      register: nomad_service_exists  
+
+    - name: Preflight > Set fact to install nomad if it does not exist
+      ansible.builtin.set_fact:
+        nomad_should_install: true
+      when: not nomad_is_already_installed.stat.exists
+
+    - name: Preflight > Gather currently installed version (if any)
+      win_command: "{{ nomad_install_dir }}\\nomad.exe --version"
+      changed_when: false
+      register: nomad_version_output
+      when: nomad_is_already_installed.stat.exists
+
+    - name: Preflight > Extract version
+      ansible.builtin.set_fact:
+        nomad_installed_version: "{{ nomad_version_output.stdout | regex_search('(\\d+\\.\\d+\\.\\d+)') }}"
+      when: nomad_version_output.stdout is defined
+
+
+    - name: Preflight > Set fact to update Nomad if the version does not match
+      ansible.builtin.set_fact:
+        nomad_should_update: true
+      when: >
+        not ansible_check_mode and
+        nomad_is_already_installed.stat.exists and
+        nomad_installed_version != nomad_version
+
+    - name: Preflight > Display current status
+      ansible.builtin.debug:
+        msg:
+        - "Should install: {{ nomad_should_install }}"
+        - "Should update: {{ nomad_should_update }}{% if nomad_installed_version is defined %} (current version: {{ nomad_installed_version | default('') }}){% endif %}"

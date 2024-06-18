@@ -1,0 +1,10 @@
+- name: retrieve and download Nomad
+  hosts: Nomad
+
+  roles:
+    - role: Nomad
+      vars:
+        # Set to absent for uninstall
+      software_state: "present"
+
+      nomad_config_mode: "server"

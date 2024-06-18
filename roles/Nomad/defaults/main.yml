@@ -1,0 +1,24 @@
+---
+nomad_version: 1.8.0 
+
+nomad_arch: 'amd64'
+
+nomad_install_dir: "D:/Nomad/"
+nomad_data_dir: "D:/Nomad/data"
+nomad_config_dir: "D:/Nomad/config"
+nomad_certs_dir: "D:/Nomad/certs"
+nomad_policies_dir: "D:/Nomad/policies"
+nomad_temp_path: 'C:/TEMP/'
+nomad_config_mode: "cli-mode"
+nomad_client_config_file: "nomad-client.hcl.j2"
+nomad_server_config_file: "nomad-server.hcl.j2"
+
+nomad_binary_url: "https://releases.hashicorp.com/nomad/1.8.0/nomad_1.8.0_windows_amd64.zip"
+nomad_temp_path: "C:/TEMP/"
+
+winsw_binary_url: "https://github.com/winsw/winsw/releases/download/v3.0.0-alpha.11/WinSW-x64.exe"
+
+#nomad_encryption_key
+#nomad_acl_token
+
+#nomad_address

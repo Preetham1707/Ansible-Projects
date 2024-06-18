@@ -1,0 +1,88 @@
+---
+- name: Install > Install
+  when: software_state == "present" and (nomad_should_install or nomad_should_update)
+
+  block:
+
+      - name: Install > Stop service before update
+        win_command: "{{nomad_install_dir}}//nomad-service.exe stop"
+        when: nomad_service_exists and nomad_should_update 
+
+
+      - name: Install > Create the Nomad temp directory
+        ansible.windows.win_file:
+          path: "{{nomad_temp_path}}"
+          state: directory
+        register: Nomad_tempdir_creation
+        until: Nomad_tempdir_creation is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false
+
+
+      - name: Install > creating Nomad Dir
+        win_file:
+          path: "{{item}}"
+          state: directory
+        with_items:
+        - "{{nomad_install_dir}}"
+        - "{{nomad_data_dir}}"
+        - "{{nomad_config_dir}}"
+        - "{{nomad_certs_dir}}"
+        - "{{nomad_policies_dir}}"
+
+      - name: Install > Downloading Nomad Binary
+        ansible.windows.win_get_url:
+          url: "{{nomad_binary_url}}"
+          dest: "{{nomad_temp_path}}"
+        register: nomad_download_task
+        until: nomad_download_task is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false
+
+      - name: Install > Unzip Nomad Binary
+        win_unzip:
+          src: "{{nomad_temp_path}}\\nomad_1.8.0_windows_amd64.zip"
+          dest: "{{nomad_temp_path}}"
+        register: nomad_extract_task
+        until: nomad_extract_task is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false
+
+      - name: Install > Copy Nomad Binary files
+        win_copy:
+          src: "{{nomad_temp_path}}\\nomad.exe"
+          dest: "{{nomad_install_dir}}"
+          remote_src: true
+        register: nomad_copy_task
+        until: nomad_copy_task is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false
+
+
+      - name: Install > Cleaning up the nomad temp directory
+        ansible.windows.win_file:
+          path: "{{nomad_temp_path}}"
+          state: absent
+        register: nomad_clean_temp_dir
+        until: nomad_clean_temp_dir is succeeded
+        retries: 5
+        delay: 2
+        check_mode: false
+
+      
+
+      - name: Install > Ensure the Nomad Dir in sys Variables
+        win_environment:
+          level: machine
+          variables:
+            NOMAD_DIR: "{{nomad_install_dir}}"
+
+
+      - name: Install > Ensure that Nomad is on system path variable
+        when: not ansible_check_mode
+        win_path:
+          elements: "%NOMAD_DIR%"

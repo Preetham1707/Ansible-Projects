@@ -6,3 +6,13 @@ ansible_password=Chidori@1234
 ansible_port = 5986
 ansible_connection=winrm
 ansible_winrm_server_cert_validation=ignore
+
+[Nomad]
+4.246.227.122
+[Nomad:vars]
+ansible_user=Nomad
+ansible_password=Chidori@1234
+ansible_port = 5986
+ansible_connection=winrm
+ansible_winrm_server_cert_validation=ignore
+
